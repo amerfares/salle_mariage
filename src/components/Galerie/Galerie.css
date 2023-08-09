@@ -1,0 +1,27 @@
+.container {
+    margin: 20px; /* Ajoute une marge de 20px autour du container */
+    padding: 10px; /* Ajoute un padding pour espacer les éléments à l'intérieur du container */
+  }
+
+
+
+  .slick-next:before,
+  .slick-prev:before {
+    content: "" !important;
+  }
+
+
+  .next-slick-arrow,
+  .prev-slick-arrow {
+    color: #F0F0F2;
+    font-size: 45px;
+    cursor: pointer;
+    transition: transform 0.3s, color 0.3s; 
+  }
+
+.next-slick-arrow:hover,
+.prev-slick-arrow:hover {
+  transform: scale(1.2); /* Agrandit la flèche au survol */
+  color: #AAAAAA; /* Change la couleur de la flèche au survol */
+}
+
