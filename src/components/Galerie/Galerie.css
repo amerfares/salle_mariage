@@ -1,9 +1,12 @@
 .container {
     margin: 20px; /* Ajoute une marge de 20px autour du container */
     padding: 10px; /* Ajoute un padding pour espacer les éléments à l'intérieur du container */
+
   }
 
-
+.image {
+  box-shadow: 0px 0px px rgba(0, 0, 0, 0.2);
+}
 
   .slick-next:before,
   .slick-prev:before {
@@ -17,6 +20,8 @@
     font-size: 45px;
     cursor: pointer;
     transition: transform 0.3s, color 0.3s; 
+    position: absolute;
+
   }
 
 .next-slick-arrow:hover,
@@ -25,3 +30,33 @@
   color: #AAAAAA; /* Change la couleur de la flèche au survol */
 }
 
+.thumbnail-container {
+  margin-top: 20px; /* Ajustez la marge supérieure comme souhaité */
+  text-align: center;
+  padding: 10px;
+  margin: 20px;
+}
+
+.thumbnail-slider {
+  margin-top: 10px; /* Ajustez la marge supérieure comme souhaité */
+  display: flex;
+  justify-content: center; /* Centre horizontalement */
+  align-items: center; /* Centre verticalement */
+  
+}
+
+.thumbnail {
+  display: inline-block;
+  margin: 0 5px; /* Ajustez la marge horizontale comme souhaité */
+}
+
+.thumbnail img {
+  width: 60px; /* Ajustez la largeur des miniatures comme souhaité */
+  height: auto;
+  cursor: pointer;
+  border: 2px solid transparent; /* Ajoutez une bordure pour mettre en évidence au survol */
+}
+
+.thumbnail img:hover {
+  border-color: #007BFF; /* Changez la couleur de la bordure au survol */
+}

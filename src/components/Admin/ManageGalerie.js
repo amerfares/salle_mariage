@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Button, TextField, IconButton } from '@mui/material';
+import {
+  Button,
+  TextField,
+  IconButton,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from '@mui/material';
 import {
     Table,
     TableBody,
@@ -15,6 +24,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 function ManageGalerie() {
     const [galleryData, setGalleryData] = useState([]);
@@ -22,6 +32,8 @@ function ManageGalerie() {
     const [editOrder, setEditOrder] = useState('');
     const [alertMessage, setAlertMessage] = useState('');
     const [alertSeverity, setAlertSeverity] = useState('success');
+    const [deleteItemId, setDeleteItemId] = useState(null);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
     useEffect(() => {
         fetchGalleryData();
@@ -104,28 +116,31 @@ function ManageGalerie() {
         }
       };
 
-      const handleSaveAllOrders = async () => {
-        try {
-          const updatedOrders = galleryData.map((item) => {
-            return { id: item.id, Ordre: item.Ordre };
-          });
+
+      const handleDeleteConfirmation = (itemId) => {
+        setDeleteItemId(itemId);
+        setDeleteDialogOpen(true);
+      };
     
-          const response = await axios.put('http://localhost:5000/api/galerie', {
-            updatedOrders,
-          });
+      const handleDeletePhoto = async (itemId) => {
+        console.log(itemId)
+        try {
+          const response = await axios.delete(`http://localhost:5000/api/galerie-delete/${itemId}`);
     
           if (response.data.message) {
-            setAlertSeverity('success');
-            setAlertMessage('Toutes les modifications ont été enregistrées.');
+            // Suppression réussie, mettre à jour la liste
             fetchGalleryData();
+            setAlertSeverity('success');
+            setAlertMessage('Photo supprimée avec succès.');
           }
         } catch (error) {
           setAlertSeverity('error');
-          setAlertMessage('Erreur lors de l\'enregistrement en masse.');
+          setAlertMessage('Erreur lors de la suppression de la photo.');
         }
+        setDeleteDialogOpen(false);
+        setDeleteItemId(null);
       };
       
-    
   
     return (
       <div>
@@ -144,49 +159,69 @@ function ManageGalerie() {
       )}
       <div>
       <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Ordre</TableCell>
-                <TableCell>Image</TableCell>
-                <TableCell></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {galleryData.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell>
-                    {editItemId === item.id ? (
-                      <TextField
-                        value={editOrder}
-                        onChange={(e) => setEditOrder(e.target.value)}
-                      />
-                    ) : (
-                      item.Ordre
-                    )}
-                  </TableCell>
-                  <TableCell>{item.lien}</TableCell>
-                  <TableCell>
-                    {editItemId === item.id ? (
-                      <>
-                        <IconButton onClick={() => handleSaveOrder(item.id)}>
-                          <SaveIcon />
-                        </IconButton>
-                        <IconButton onClick={() => setEditItemId(null)}>
-                          <CloseIcon />
-                        </IconButton>
-                      </>
-                    ) : (
-                      <IconButton onClick={() => handleEditOrder(item.id, item.Ordre)}>
-                        <EditIcon />
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Ordre</TableCell>
+              <TableCell>Image</TableCell>
+              <TableCell></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {galleryData.map((item) => (
+              <TableRow key={item.id}>
+                <TableCell>
+                  {editItemId === item.id ? (
+                    <TextField
+                      value={editOrder}
+                      onChange={(e) => setEditOrder(e.target.value)}
+                    />
+                  ) : (
+                    item.Ordre
+                  )}
+                </TableCell>
+                <TableCell>{item.lien}</TableCell>
+                <TableCell>
+                  {editItemId === item.id ? (
+                    <>
+                      <IconButton onClick={() => handleSaveOrder(item.id)}>
+                        <SaveIcon />
                       </IconButton>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                      <IconButton onClick={() => setEditItemId(null)}>
+                        <CloseIcon />
+                      </IconButton>
+                    </>
+                  ) : (
+                    <IconButton onClick={() => handleEditOrder(item.id, item.Ordre)}>
+                      <EditIcon />
+                    </IconButton>
+                  )}
+                  <IconButton onClick={() => handleDeleteConfirmation(item.id)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogTitle>Confirmation de la suppression</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Êtes-vous sûr de vouloir supprimer cette photo ?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)} color="primary">
+            Annuler
+          </Button>
+          <Button onClick={() => handleDeletePhoto(deleteItemId)} color="primary">
+            Supprimer
+          </Button>
+        </DialogActions>
+      </Dialog>
       </div>
     </div>
       </div>

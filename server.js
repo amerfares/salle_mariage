@@ -3,6 +3,7 @@ const mysql = require('mysql2');
 const multer = require('multer');
 const app = express();
 const path = require('path');
+const fs = require('fs');
 const PORT = process.env.PORT || 5000;
 const cors = require('cors'); // Importez le module cors
 
@@ -122,6 +123,52 @@ app.put('/api/galerie/:id', (req, res) => {
       }
     });
   });
+});
+
+
+// Endpoint pour supprimer une photo de la galerie
+app.delete('/api/galerie-delete/:itemId', async (req, res) => {
+  try {
+    const itemId = req.params.itemId;
+
+    // Récupérer le lien de la photo depuis la base de données
+    const lienQuery = "SELECT lien FROM galerie WHERE id=?";
+    db.query(lienQuery, [itemId], async (error, results) => {
+      if (error) {
+        console.error('Erreur lors de la récupération du lien de la photo :', error);
+        return res.status(500).json({ error: 'Erreur lors de la suppression de la photo.' });
+      }
+
+      if (results.length === 0) {
+        return res.status(404).json({ error: 'L\'élément de la galerie n\'existe pas.' });
+      }
+
+      const photoLien = results[0].lien;
+
+      // Supprimer la photo du dossier public/Image
+      const photoPath = path.join(__dirname, 'public/Image', photoLien);
+      fs.promises.unlink(photoPath);
+
+      // Supprimer la photo de la base de données
+      const deleteQuery = "DELETE FROM galerie WHERE id=?";
+      db.query(deleteQuery, [itemId], async (error, result) => {
+        if (error) {
+          console.error('Erreur lors de la suppression de l\'élément de la galerie :', error);
+          return res.status(500).json({ error: 'Erreur lors de la suppression de la photo.' });
+        }
+
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ error: 'L\'élément de la galerie n\'existe pas.' });
+        }
+
+        // Suppression réussie, renvoyer une réponse
+        res.json({ message: 'Photo supprimée avec succès.' });
+      });
+    });
+  } catch (error) {
+    console.error('Erreur lors de la suppression de la photo :', error);
+    res.status(500).json({ error: 'Erreur lors de la suppression de la photo.' });
+  }
 });
 
 
