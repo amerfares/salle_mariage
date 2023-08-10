@@ -1,13 +1,27 @@
-import React from 'react';
+import React, { useRef } from 'react'
+import emailjs from 'emailjs-com';
+
 import { Grid, TextField, Button, Card, CardContent, Typography } from '@mui/material';
 
 
 const Contact = () => {
+  const form = useRef();
+  const serviceId = process.env.REACT_APP_EMAILJS_SERVICE_ID;
+  const templateId = process.env.REACT_APP_EMAILJS_TEMPLATE_ID;
+  const publicKey = process.env.REACT_APP_EMAILJS_PUBLIC_KEY;
+
 
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Ici, vous pouvez mettre la logique pour envoyer le formulaire
+    
+
+    emailjs.sendForm(serviceId, templateId , form.current, publicKey)
+      .then((result) => {
+          console.log(result.text);
+      }, (error) => {
+          console.log(error.text);
+      });
   };
 
   return (
@@ -21,10 +35,11 @@ const Contact = () => {
             <Typography variant="body2" color="textSecondary" component="p" gutterBottom>
               Remplissez le formulaire et notre équipe vous répondra dans les 24 heures.
             </Typography>
-            <form onSubmit={handleSubmit}>
+            <form ref={form} onSubmit={handleSubmit}>
               <Grid container spacing={1}>
                 <Grid xs={12} sm={6} item>
                   <TextField
+                    name="user_name"
                     label="Prénom"
                     placeholder="Prénom"
                     variant="outlined"
@@ -34,6 +49,7 @@ const Contact = () => {
                 </Grid>
                 <Grid xs={12} sm={6} item>
                   <TextField
+                    name="user_last_name"
                     label="Nom"
                     placeholder="Nom"
                     variant="outlined"
@@ -43,6 +59,7 @@ const Contact = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
+                    name="user_email"
                     type="email"
                     label="Adresse e-mail"
                     placeholder="Adresse e-mail"
@@ -53,6 +70,7 @@ const Contact = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
+                    name="user_phone_number"
                     type="tel"
                     label="Numéro de téléphone"
                     placeholder="Numéro de téléphone"
@@ -63,6 +81,7 @@ const Contact = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
+                    name="message_subject"
                     label="Sujet du message"
                     placeholder="Sujet du message"
                     variant="outlined"
@@ -72,6 +91,7 @@ const Contact = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
+                    name="message"
                     label="Message"
                     multiline
                     rows={4}
