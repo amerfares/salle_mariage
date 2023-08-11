@@ -29,7 +29,7 @@ function App() {
           <Route path="/a-propos" element={<APropos />} />
           <Route path="/nos-services" element={<Services />} />
           <Route path="/tarifs" element={<Tarifs />} />
-          <Route path="/temoignage-avis" element={<Avis />} />
+          <Route path="/avis" element={<Avis />} />
           <Route path="/disponibilites" element={<Disponibilites />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/acces" element={<Acces />} />

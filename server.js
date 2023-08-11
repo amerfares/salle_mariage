@@ -247,6 +247,20 @@ app.post('/api/avis', async (req, res) => {
   }
 });
 
+// Endpoint pour récupérer les avis avec best=true
+app.get('/api/avis/best', (req, res) => {
+  const query = 'SELECT * FROM avis WHERE best = true';
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Erreur lors de la récupération des avis:', err);
+      res.status(500).json({ message: 'Erreur lors de la récupération des avis' });
+    } else {
+      res.json(results);
+    }
+  });
+});
+
 
 
 // Définir les routes ou d'autres configurations ici
