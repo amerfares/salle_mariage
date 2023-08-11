@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container, Typography, Paper, Box, TextField, Button, IconButton, Grid } from '@mui/material';
 import StarsIcon from '@mui/icons-material/Stars';
@@ -11,6 +11,20 @@ const Avis = () => {
   const [prenom, setPrenom] = useState('');
   const [avis, setAvis] = useState('');
   const [afficherFormulaire, setAfficherFormulaire] = useState(false);
+  const [avisList, setAvisList] = useState([]);
+
+  useEffect(() => {
+    fetchAvisList();
+  }, []);
+
+  const fetchAvisList = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/avis');
+      setAvisList(response.data);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des avis:', error);
+    }
+  };
 
   const handleStarClick = (starCount) => {
     setEtoiles(starCount);
@@ -77,6 +91,24 @@ const Avis = () => {
             Laisser un avis
           </Button>
         ) : null}
+
+        <Grid container spacing={2}>
+          {avisList.map((avisItem) => (
+            <Grid item xs={12} key={avisItem.id}>
+              <Paper elevation={3} style={{ padding: '20px', marginTop: '20px' }}>
+                <Typography variant="h6" align="center">
+                  {avisItem.etoiles} étoiles
+                </Typography>
+                <Typography variant="body1" align="center">
+                  <strong>{`${avisItem.nom.toUpperCase()} ${avisItem.prenom}`}</strong>
+                </Typography>
+                <Typography variant="body2" align="center">
+                  {avisItem.avis}
+                </Typography>
+              </Paper>
+            </Grid>
+          ))}
+        </Grid>
 
         {afficherFormulaire && (
           <Paper elevation={3} style={{ padding: '20px', marginTop: '20px' }}>
