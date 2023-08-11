@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container, Typography, Paper, Box, TextField, Button, IconButton, Grid } from '@mui/material';
 import StarsIcon from '@mui/icons-material/Stars';
+import AvisGrid from './AvisGrid';
 
 const Avis = () => {
   const [etoiles, setEtoiles] = useState(0);
@@ -82,6 +83,10 @@ const Avis = () => {
           Laissez votre avis
         </Typography>
 
+        
+
+        <AvisGrid avisList={avisList} />
+
         {!afficherFormulaire ? (
           <Button
             variant="contained"
@@ -91,24 +96,6 @@ const Avis = () => {
             Laisser un avis
           </Button>
         ) : null}
-
-        <Grid container spacing={2}>
-          {avisList.map((avisItem) => (
-            <Grid item xs={12} key={avisItem.id}>
-              <Paper elevation={3} style={{ padding: '20px', marginTop: '20px' }}>
-                <Typography variant="h6" align="center">
-                  {avisItem.etoiles} étoiles
-                </Typography>
-                <Typography variant="body1" align="center">
-                  <strong>{`${avisItem.nom.toUpperCase()} ${avisItem.prenom}`}</strong>
-                </Typography>
-                <Typography variant="body2" align="center">
-                  {avisItem.avis}
-                </Typography>
-              </Paper>
-            </Grid>
-          ))}
-        </Grid>
 
         {afficherFormulaire && (
           <Paper elevation={3} style={{ padding: '20px', marginTop: '20px' }}>
@@ -162,16 +149,16 @@ const Avis = () => {
             />
             <Typography variant="subtitle2">Votre évaluation:</Typography>
             <Box>
-              {[1, 2, 3, 4, 5].map((star) => (
-                <IconButton
-                  key={star}
-                  color={etoiles >= star ? 'primary' : 'default'}
-                  onClick={() => handleStarClick(star)}
-                >
-                  <StarsIcon />
-                </IconButton>
-              ))}
-            </Box>
+  {[1, 2, 3, 4, 5].map((star) => (
+    <IconButton
+      key={star}
+      color={etoiles >= star ? 'primary' : 'default'}
+      onClick={() => handleStarClick(star)}
+    >
+      <StarsIcon sx={{ color: etoiles >= star ? '#EFC443' : 'inherit' }} />
+    </IconButton>
+  ))}
+</Box>
             <Grid container justifyContent="space-between">
                 <Button
                   type="submit"
@@ -197,6 +184,7 @@ const Avis = () => {
                 </Button>
               </Grid>
             </form>
+            
           </Paper>
         )}
       </Container>

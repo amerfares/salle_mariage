@@ -208,6 +208,26 @@ app.post("/api/send-email", async (req, res) => {
   }
 });
 
+
+
+app.get('/api/avis', async (req, res) => {
+  try {
+    const selectAvis = 'SELECT etoiles, nom, prenom, avis FROM avis';
+    db.query(selectAvis, (error, results) => {
+      if (error) {
+        console.error('Erreur lors de la récupération des avis:', error);
+        res.status(500).json({ message: 'Erreur lors de la récupération des avis.' });
+      } else {
+        res.json(results);
+      }
+    });
+  } catch (error) {
+    console.error('Erreur lors de la récupération des avis:', error);
+    res.status(500).json({ message: 'Erreur lors de la récupération des avis.' });
+  }
+});
+
+
 app.post('/api/avis', async (req, res) => {
   try {
     const { nom, prenom, avis, etoiles } = req.body;
