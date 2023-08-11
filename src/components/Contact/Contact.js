@@ -1,31 +1,49 @@
-import React, { useRef } from 'react'
+import React,  { useState }  from 'react'
 import emailjs from 'emailjs-com';
+import axios from 'axios'; 
 
 import { Grid, TextField, Button, Card, CardContent, Typography } from '@mui/material';
 
-
 const Contact = () => {
-  const form = useRef();
-  const serviceId = process.env.REACT_APP_EMAILJS_SERVICE_ID;
-  const templateId = process.env.REACT_APP_EMAILJS_TEMPLATE_ID;
-  const publicKey = process.env.REACT_APP_EMAILJS_PUBLIC_KEY;
+  
+  
+  //const serviceId = process.env.REACT_APP_EMAILJS_SERVICE_ID;
+  //const templateId = process.env.REACT_APP_EMAILJS_TEMPLATE_ID;
+  //const publicKey = process.env.REACT_APP_EMAILJS_PUBLIC_KEY;
 
 
+  const [formData, setFormData] = useState({
+    user_name: '',
+    user_last_name: '',
+    user_email: '',
+    user_phone_number: '',
+    message_subject: '',
+    message: ''
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value
+    }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
 
-    emailjs.sendForm(serviceId, templateId , form.current, publicKey)
-      .then((result) => {
-          console.log(result.text);
-      }, (error) => {
-          console.log(error.text);
-      });
+    try {
+      const response = axios.post('http://localhost:5000/api/send-email', formData);
+      console.log("E-mail envoyé avec succès !");
+      // Ajoutez ici la logique pour afficher un message de succès à l'utilisateur
+    } catch (error) {
+      console.error("Erreur lors de l'envoi de l'e-mail :", error);
+      // Ajoutez ici la logique pour afficher un message d'erreur à l'utilisateur
+    }
   };
 
   return (
-    <div classname="container">
+    <div className="container">
        <Grid>
         <Card style={{ maxWidth: 450, padding: "20px 5px", margin: "0 auto" }}>
           <CardContent>
@@ -35,7 +53,7 @@ const Contact = () => {
             <Typography variant="body2" color="textSecondary" component="p" gutterBottom>
               Remplissez le formulaire et notre équipe vous répondra dans les 24 heures.
             </Typography>
-            <form ref={form} onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit}>
               <Grid container spacing={1}>
                 <Grid xs={12} sm={6} item>
                   <TextField
@@ -45,6 +63,7 @@ const Contact = () => {
                     variant="outlined"
                     fullWidth
                     required
+                    onChange={handleChange}
                   />
                 </Grid>
                 <Grid xs={12} sm={6} item>
@@ -55,6 +74,7 @@ const Contact = () => {
                     variant="outlined"
                     fullWidth
                     required
+                    onChange={handleChange}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -66,6 +86,7 @@ const Contact = () => {
                     variant="outlined"
                     fullWidth
                     required
+                    onChange={handleChange}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -77,6 +98,7 @@ const Contact = () => {
                     variant="outlined"
                     fullWidth
                     required
+                    onChange={handleChange}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -87,6 +109,7 @@ const Contact = () => {
                     variant="outlined"
                     fullWidth
                     required
+                    onChange={handleChange}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -99,6 +122,7 @@ const Contact = () => {
                     variant="outlined"
                     fullWidth
                     required
+                    onChange={handleChange}
                   />
                 </Grid>
                 <Grid item xs={12}>

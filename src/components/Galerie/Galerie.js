@@ -1,16 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Slider from "react-slick";
-import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
-import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import './Galerie.css';
+import Carousel from 'react-gallery-carousel';
+import 'react-gallery-carousel/dist/index.css';
+import { Grid, Typography, Container } from '@mui/material';
 
 const Galerie = () => {
   const [liens, setLiens] = useState([]);
-  const [slider1, setSlider1] = useState(null);
-  const thumbnailSliderRef = useRef(null); // Référence du carrousel de miniatures
+  const [images, setImages] = useState([]);
 
   useEffect(() => {
     axios.get('http://localhost:5000/api/galerie-lien')
@@ -23,77 +19,32 @@ const Galerie = () => {
   }, []);
 
   useEffect(() => {
-    if (slider1) {
-      setSlider1(slider1);
-    }
-  }, [slider1]);
-
-  var settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    nextArrow: (
-      <div>
-        <div className="next-slick-arrow"> <ArrowCircleRightIcon/> </div>
-      </div>
-    ),
-    prevArrow: (
-      <div>
-        <div className="prev-slick-arrow"> <ArrowCircleLeftIcon /> </div>
-      </div>
-    )
-  };
-
-  const thumbnailSettings = {
-    slidesToShow: 5,
-    slidesToScroll: 1,
-    swipeToSlide: true,
-    focusOnSelect: true,
-    asNavFor: slider1,
-    nextArrow: (
-      <div>
-        <div className="next-slick-arrow"> <ArrowCircleRightIcon/> </div>
-      </div>
-    ),
-    prevArrow: (
-      <div>
-        <div className="prev-slick-arrow"> <ArrowCircleLeftIcon /> </div>
-      </div>
-    )
-
-  };
-
-  const handleThumbnailClick = (index) => {
-    if (thumbnailSliderRef.current) {
-      thumbnailSliderRef.current.slickGoTo(index);
-    }
-  };
+    const imagesArray = liens.map(lien => ({
+      src: `Image/${lien}`,
+    }));
+    setImages(imagesArray);
+  }, [liens]);
 
   return (
     <div>
-      <div className='container'>
-        <Slider {...settings} ref={(slider) => setSlider1(slider)} className="slider-for">
-          {liens.map((lien, index) => (
-            <div key={index} className='image'>
-              <img src={"Image/" + lien} alt={`Image ${index}`} />
-            </div>
-          ))}
-        </Slider>
-      </div>
+      <Container maxWidth="md">
+        {/* Présentation de la salle */}
+        <Typography variant="h4" align="center" gutterBottom>
+          Bienvenue dans notre Salle de Mariage
+        </Typography>
+        <Typography variant="body1" align="center" gutterBottom>
+          Découvrez notre espace élégant et romantique, parfait pour célébrer
+          votre mariage avec style. Parcourez les photos ci-dessous pour avoir
+          un aperçu de notre magnifique salle.
+        </Typography>
 
-      <div className='thumbnail-container'>
-        <div className="thumbnail-nav">
-          <Slider {...thumbnailSettings} ref={thumbnailSliderRef} className='thumbnail-slider'>
-            {liens.map((lien, index) => (
-              <div key={index} className='thumbnail' onClick={() => handleThumbnailClick(index)}>
-                <img src={"Image/" + lien} alt={`Thumbnail ${index}`} />
-              </div>
-            ))}
-          </Slider>
-        </div>
-      </div>
+        {/* Carrousel d'images */}
+        <Grid container justifyContent="center">
+          <Grid item xs={12} md={12} lg={12}>
+            <Carousel images={images} autoPlayInterval={3000} />
+          </Grid>
+        </Grid>
+      </Container>
     </div>
   );
 };

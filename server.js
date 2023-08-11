@@ -6,9 +6,12 @@ const path = require('path');
 const fs = require('fs');
 const PORT = process.env.PORT || 5000;
 const cors = require('cors'); // Importez le module cors
+const nodemailer = require("nodemailer");
+require('dotenv').config();
+
+
 
 app.use(cors());
-
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
@@ -168,6 +171,59 @@ app.delete('/api/galerie-delete/:itemId', async (req, res) => {
   } catch (error) {
     console.error('Erreur lors de la suppression de la photo :', error);
     res.status(500).json({ error: 'Erreur lors de la suppression de la photo.' });
+  }
+});
+
+
+
+
+// Configuration de Nodemailer
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.REACT_APP_EMAIL_ADMIN,
+    pass: process.env.REACT_APP_PASSWORD_ADMIN,
+  },
+});
+
+app.post("/api/send-email", async (req, res) => {
+  const { user_name, user_last_name, user_email, user_phone_number, message_subject, message } = req.body;
+  
+  const mailOptions = {
+    from: process.env.REACT_APP_EMAIL_ADMIN,
+    to: user_email,
+    subject: message_subject,
+    text: `De: ${user_name} ${user_last_name}\nE-mail: ${user_email}\nTéléphone: ${user_phone_number}\n\nMessage: ${message}`,
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log("E-mail envoyé :", info.response);
+    res.json({ message: "E-mail envoyé avec succès !" });
+  } catch (error) {
+    console.error("Erreur lors de l'envoi de l'e-mail :", error);
+    res.status(500).json({ error: "Une erreur s'est produite lors de l'envoi de l'e-mail." });
+  }
+});
+
+app.post('/api/avis', async (req, res) => {
+  try {
+    const { nom, prenom, avis, etoiles } = req.body;
+
+    const insertAvis = 'INSERT INTO avis (nom, prenom, avis, etoiles) VALUES (?, ?, ?, ?)';
+    db.query(insertAvis, [nom, prenom, avis, etoiles], (error, result) => {
+      if (error) {
+        console.error('Erreur lors de l\'enregistrement de l\'avis:', error);
+        res.status(500).json({ message: 'Erreur lors de l\'enregistrement de l\'avis.' });
+      } else {
+        res.json({ message: 'Avis enregistré avec succès !' });
+      }
+    });
+  } catch (error) {
+    console.error('Erreur lors de l\'enregistrement de l\'avis:', error);
+    res.status(500).json({ message: 'Erreur lors de l\'enregistrement de l\'avis.' });
   }
 });
 
