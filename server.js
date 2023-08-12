@@ -330,6 +330,25 @@ app.get('/reservations/date/:date', (req, res) => {
   });
 });
 
+
+// Endpoint pour créer une réservation
+app.post('/reservations/create', (req, res) => {
+  const { user_nom, user_prenom, user_phone, user_email, date } = req.body;
+
+  const sql = `INSERT INTO reservation (user_nom, user_prenom, user_phone, user_email, date)
+               VALUES (?, ?, ?, ?, ?)`;
+
+  db.query(sql, [user_nom, user_prenom, user_phone, user_email, date], (err) => {
+    if (err) {
+      console.error('Erreur lors de la création de la réservation :', err);
+      res.status(500).json({ message: 'Erreur lors de la création de la réservation' });
+    } else {
+      console.log('Réservation créée avec succès');
+      res.status(200).json({ message: 'Réservation créée avec succès' });
+    }
+  });
+});
+
 // Définir les routes ou d'autres configurations ici
 
 app.listen(PORT, () => {

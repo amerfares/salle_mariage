@@ -12,6 +12,7 @@ import Acces from './components/Acces/Acces';
 import Reservation from './components/Reservation/Reservation';
 import ManageGalerie from './components/Admin/ManageGalerie';
 import AdmDashboard from './components/Admin/AdmDashboard';
+import AdmReservation from './components/Admin/AdmReservation';
 
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
           <Route path="adm" >
             <Route path="galerie" element={<ManageGalerie />} />
             <Route path="dashboard" element={<AdmDashboard/>} />
+            <Route path="reservation" element={<AdmReservation/>} />
           </Route>
         </Routes>
       </div>
