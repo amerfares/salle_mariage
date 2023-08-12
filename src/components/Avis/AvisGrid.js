@@ -4,7 +4,7 @@ import StarsIcon from '@mui/icons-material/Stars';
 
 const AvisGrid = ({ avisList }) => {
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={2} key={999}>
       {avisList.map((avis) => (
         <Grid item xs={12} key={avis.id}>
           <Paper elevation={3} style={{ padding: '20px' }}>

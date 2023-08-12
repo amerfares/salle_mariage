@@ -94,7 +94,6 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
 });
 
 // Endpoint pour mettre à jour l'ordre d'une image dans la base de données
-// Endpoint pour mettre à jour l'ordre d'une image dans la base de données
 app.put('/api/galerie/:id', (req, res) => {
   const { id } = req.params;
   const { Ordre } = req.body;
@@ -178,35 +177,36 @@ app.delete('/api/galerie-delete/:itemId', async (req, res) => {
 
 
 // Configuration de Nodemailer
+
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false,
-  auth: {
+    service: 'gmail',
+    auth: {
     user: process.env.REACT_APP_EMAIL_ADMIN,
     pass: process.env.REACT_APP_PASSWORD_ADMIN,
   },
 });
 
 app.post("/api/send-email", async (req, res) => {
+  console.log(process.env.REACT_APP_EMAIL_ADMIN)
   const { user_name, user_last_name, user_email, user_phone_number, message_subject, message } = req.body;
   
   const mailOptions = {
     from: process.env.REACT_APP_EMAIL_ADMIN,
-    to: user_email,
-    subject: message_subject,
+    to: process.env.REACT_APP_EMAIL_ADMIN,
+    subject: "CONTACT VIA VOTRE SITE :" + message_subject,
     text: `De: ${user_name} ${user_last_name}\nE-mail: ${user_email}\nTéléphone: ${user_phone_number}\n\nMessage: ${message}`,
+  
   };
 
-  try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log("E-mail envoyé :", info.response);
-    res.json({ message: "E-mail envoyé avec succès !" });
-  } catch (error) {
-    console.error("Erreur lors de l'envoi de l'e-mail :", error);
-    res.status(500).json({ error: "Une erreur s'est produite lors de l'envoi de l'e-mail." });
-  }
-});
+
+    transporter.sendMail(mailOptions, (error) => {
+      if (error) {
+        console.error('Erreur lors de l\'envoi de l\'e-mail d\'expédition:', error);
+        // Vous pouvez choisir de continuer même en cas d'erreur ici, car la commande a déjà été confirmée avec l'e-mail précédent.
+      }
+
+    });
+  })
 
 
 
@@ -261,7 +261,36 @@ app.get('/api/avis/best', (req, res) => {
   });
 });
 
+// Endpoint pour récupérer les réservations
+app.get('/reservations', (err, res) => {
+  const query='SELECT id, user_nom, user_prenom, user_phone, user_email, date FROM reservation';
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("Erreur lors de la récupérations des réservations", err);
+    }  
+    else {
+      res.json(results);
+      console.log("Récupération ok!")
+    }
+  });
+})
 
+
+// Endpoint pour supprimer une réservation
+app.delete('/reservations/delete/:id,user_email', (req, res) => {
+  const reservationId = req.params.id;
+  const query = 'DELETE FROM reservation WHERE id = ?';
+  
+  db.query(query, [reservationId], (err, result) => {
+    if (err) {
+      console.error("Erreur lors de la suppression de la réservation", err);
+      res.status(500).json({ error: "Erreur lors de la suppression de la réservation" });
+    } else {
+      console.log("Réservation supprimée avec succès !");
+      res.json({ message: "Réservation supprimée avec succès !" });
+    }
+  });
+});
 
 // Définir les routes ou d'autres configurations ici
 
