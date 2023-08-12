@@ -276,18 +276,56 @@ app.get('/reservations', (err, res) => {
 })
 
 
-// Endpoint pour supprimer une réservation
-app.delete('/reservations/delete/:id,user_email', (req, res) => {
+app.delete('/reservations/delete/:id', (req, res) => {
   const reservationId = req.params.id;
-  const query = 'DELETE FROM reservation WHERE id = ?';
-  
-  db.query(query, [reservationId], (err, result) => {
+
+  db.query('SELECT user_email, date FROM reservation WHERE id = ?', [reservationId], (err, results) => {
     if (err) {
-      console.error("Erreur lors de la suppression de la réservation", err);
-      res.status(500).json({ error: "Erreur lors de la suppression de la réservation" });
+      console.error("Erreur lors de la récupération de la réservation pour l'envoi de l'e-mail :", err);
+      res.status(500).json({ error: "Erreur lors de la récupération de la réservation pour l'envoi de l'e-mail" });
     } else {
-      console.log("Réservation supprimée avec succès !");
-      res.json({ message: "Réservation supprimée avec succès !" });
+      const user_email = results[0].user_email;
+      const date = new Date(results[0].date).toLocaleDateString();
+
+      const query = 'DELETE FROM reservation WHERE id = ?';
+      db.query(query, [reservationId], (deleteErr, result) => {
+        if (deleteErr) {
+          console.error("Erreur lors de la suppression de la réservation :", deleteErr);
+          res.status(500).json({ error: "Erreur lors de la suppression de la réservation" });
+        } else {
+          const mailOptions = {
+            from: process.env.REACT_APP_EMAIL_ADMIN,
+            to: user_email,
+            subject: "ANNULATION RDV AVEC VOILIER91 : "  + date ,
+            text: `Votre rendez-vous pour le ${date} a été annulé.`
+          };
+
+          transporter.sendMail(mailOptions, (emailError) => {
+            if (emailError) {
+              console.error('Erreur lors de l\'envoi de l\'e-mail d\'expédition:', emailError);
+            }
+          });
+          res.json({ message: "Réservation supprimée avec succès !" });
+        }
+      });
+    }
+  });
+});
+
+
+// Endpoint pour récupérer les réservations pour une date donnée
+app.get('/reservations/date/:date', (req, res) => {
+  const selectedDate = req.params.date;
+  const query = 'SELECT id, user_nom, user_prenom, user_phone, user_email, date FROM reservation WHERE DATE(date) = ?';
+  
+  db.query(query, [selectedDate], (err, results) => {
+    console.log(selectedDate);
+    if (err) {
+      console.error("Erreur lors de la récupération des réservations pour la date donnée", err);
+      res.status(500).json({ error: "Erreur lors de la récupération des réservations pour la date donnée" });
+    } else {
+      res.json(results);
+      console.log("Réservations pour la date donnée récupérées avec succès !");
     }
   });
 });
